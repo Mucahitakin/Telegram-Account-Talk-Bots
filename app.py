@@ -34,7 +34,6 @@ def load_json_file(file_name):
         return []
 
 async def process_messages(file_choice, target_group):
-
     if file_choice == 1:
         messages = load_txt_file('1.txt')
     elif file_choice == 2:
@@ -52,6 +51,7 @@ async def process_messages(file_choice, target_group):
                 except Exception as e:
                     print(f"Error sending message: {e}")
 
+                # Message send time, random between 1 and 3 seconds
                 await asyncio.sleep(random.uniform(1, 3))
 
         elif file_choice == 3:
@@ -59,7 +59,7 @@ async def process_messages(file_choice, target_group):
                 question = qa.get("question")
                 answers = qa.get("answers", [])
 
-                if not question or not answers:
+                if not question or len(answers) < 2:
                     continue
 
                 client_asking = random.choice(clients)
@@ -78,16 +78,20 @@ async def process_messages(file_choice, target_group):
                 except Exception as e:
                     print(f"Error sending question: {e}")
 
-                answer_1 = random.choice(answers)
-                answer_2 = random.choice(answers)
+                remaining_answers = list(answers)
+                answer_1 = random.choice(remaining_answers)
+                remaining_answers.remove(answer_1)
+                answer_2 = random.choice(remaining_answers)
 
                 try:
+                    await asyncio.sleep(random.uniform(2, 5))
                     print(f"Bot (Responding from {client_responding_1.session.filename}, API ID: {client_responding_1.api_id}): {answer_1}")
                     await client_responding_1.send_message(target_group, answer_1)
                 except Exception as e:
                     print(f"Error sending first answer: {e}")
 
                 try:
+                    await asyncio.sleep(random.uniform(2, 5))
                     print(f"Bot (Responding from {client_responding_2.session.filename}, API ID: {client_responding_2.api_id}): {answer_2}")
                     await client_responding_2.send_message(target_group, answer_2)
                 except Exception as e:
